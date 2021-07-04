@@ -75,6 +75,7 @@ class SponsorsController extends WP_REST_Controller
                     $thumbnail = wp_get_attachment_url($postThumbnailId);
 
                     array_push($data, [
+                        "id" => $post->ID,
                         "name" => $post->post_title,
                         "website" => get_post_meta($post->ID, '_website', true),
                         "email" => get_post_meta($post->ID, '_email', true),
@@ -85,6 +86,7 @@ class SponsorsController extends WP_REST_Controller
         } else {
             $post = get_post($id);
 
+            $sponsorId = $post->ID;
             $name = $post->post_title;
             $website = get_post_meta($post->ID, '_website', true);
             $email = get_post_meta($post->ID, '_email', true);
@@ -93,6 +95,7 @@ class SponsorsController extends WP_REST_Controller
 
             if ($post->post_status === 'publish' && $post->post_type === 'sponsors') {
                 $data = [
+                    "id" => $sponsorId,
                     "name" => $name,
                     "website" => $website,
                     "email" => $email,
