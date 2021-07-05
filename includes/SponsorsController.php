@@ -73,10 +73,12 @@ class SponsorsController extends WP_REST_Controller
                 foreach ( $the_query->posts as $post ) {
                     $postThumbnailId = intval(get_post_meta($post->ID, '_thumbnail_id', true));
                     $thumbnail = wp_get_attachment_url($postThumbnailId);
+                    $category = wp_get_post_terms($post->ID, 'sponsor_categories');
 
                     array_push($data, [
                         "id" => $post->ID,
                         "name" => $post->post_title,
+                        "category" => $category,
                         "website" => get_post_meta($post->ID, '_website', true),
                         "email" => get_post_meta($post->ID, '_email', true),
                         "thumbnail" => $thumbnail
@@ -88,6 +90,7 @@ class SponsorsController extends WP_REST_Controller
 
             $sponsorId = $post->ID;
             $name = $post->post_title;
+            $category = wp_get_post_terms($post->ID, 'sponsor_categories');
             $website = get_post_meta($post->ID, '_website', true);
             $email = get_post_meta($post->ID, '_email', true);
             $postThumbnailId = intval(get_post_meta($post->ID, '_thumbnail_id', true));
@@ -97,6 +100,7 @@ class SponsorsController extends WP_REST_Controller
                 $data = [
                     "id" => $sponsorId,
                     "name" => $name,
+                    "category" => $category,
                     "website" => $website,
                     "email" => $email,
                     "thumbnail" => $thumbnail
