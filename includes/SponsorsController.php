@@ -37,7 +37,8 @@ class SponsorsController extends WP_REST_Controller
      */
     public function get_items($request)
     {
-        return new WP_REST_Response( ["sponsors" => $this->getSponsorsOrSingleSponsor()], 200 );
+        $queryParams = $request->get_query_params();
+        return new WP_REST_Response( ["sponsors" => $this->getSponsorsOrSingleSponsor(null, $queryParams)], 200 );
     }
 
     /**
@@ -49,7 +50,7 @@ class SponsorsController extends WP_REST_Controller
     {
         $params = $request->get_params();
         $id = $params['id'] ?? -1;
-        $data = $this->getSponsorsOrSingleSponsor($id);
+        $data = $this->getSponsorsOrSingleSponsor($id, null);
 
         if (!empty($data)) {
             return new WP_REST_Response( ["sponsor" => $data], 200 );
@@ -58,7 +59,7 @@ class SponsorsController extends WP_REST_Controller
         return new WP_Error( 'code', __( 'message', 'text-domain' ) );
     }
 
-    private function getSponsorsOrSingleSponsor($id = null): array
+    private function getSponsorsOrSingleSponsor($id = null, $queryParams = null): array
     {
         $data = [];
 
@@ -67,6 +68,19 @@ class SponsorsController extends WP_REST_Controller
                 'post_type' => 'sponsors',
                 'post_status' => 'publish'
             );
+
+            if (!empty($queryParams)) {
+                if (isset($queryParams['categories'])) {
+                    $args['tax_query'] = array(
+                        array(
+                            'taxonomy' => 'sponsor_categories',
+                            'field' => 'slug',
+                            'terms' => explode(',', $queryParams['categories']),
+                        )
+                    );
+                }
+            }
+
             $the_query = new WP_Query( $args );
 
             if ( $the_query->have_posts() ) {
